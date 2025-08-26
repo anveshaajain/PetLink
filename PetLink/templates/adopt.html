@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Adopt a Pet - PetLink{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center mb-8">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">🐾 Find Your Perfect Companion</h1>
+        <p class="text-muted">Browse through our loving pets waiting for their forever homes</p>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-8">
+        <div class="flex-between">
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-filter"></i>
+                Filter by Category
+            </h3>
+            <div class="flex gap-4">
+                <a href="{{ url_for('adopt') }}" class="btn {{ 'btn-primary' if not selected_category else 'btn-outline' }}">
+                    All Pets
+                </a>
+                {% for category in categories %}
+                    <a href="{{ url_for('adopt', category=category.name) }}" 
+                       class="btn {{ 'btn-primary' if selected_category == category.name else 'btn-outline' }}">
+                        {{ category.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="mb-4">
+        <p class="text-muted">
+            {% if selected_category %}
+                Showing {{ pets|length }} {{ selected_category.lower() }} available for adoption
+            {% else %}
+                Showing {{ pets|length }} pets available for adoption
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Pets Grid -->
+    {% if pets %}
+        <div class="grid grid-3">
+            {% for pet in pets %}
+                <div class="pet-card">
+                    <img src="{{ pet.image_url }}" alt="{{ pet.name }}" class="pet-image">
+                    <div class="pet-info">
+                        <div class="pet-name">{{ pet.name }}</div>
+                        <div class="pet-details">
+                            <p><strong>{{ pet.category_name }}</strong> • {{ pet.breed }} • {{ pet.age }} years old</p>
+                            <p class="text-muted">{{ pet.health_details }}</p>
+                            {% if pet.medical_details %}
+                                <p style="font-size: 0.875rem; color: var(--text-muted);">
+                                    <i class="fas fa-stethoscope"></i>
+                                    {{ pet.medical_details }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="flex-between">
+                            <span class="status-badge status-{{ pet.adoption_status }}">
+                                {{ pet.adoption_status.title() }}
+                            </span>
+                            {% if session.user_id and session.user_type == 'user' and pet.adoption_status == 'available' %}
+                                <button class="btn btn-primary" onclick="requestAdoption({{ pet.id }}, {{ pet.name|tojson }})">
+                                    <i class="fas fa-heart"></i>
+                                    Adopt Me
+                                </button>
+                            {% elif not session.user_id %}
+                                <a href="{{ url_for('login') }}" class="btn btn-outline">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Login to Adopt
+                                </a>
+                            {% elif session.user_type == 'owner' %}
+                                <span class="text-muted" style="font-size: 0.875rem;">Owner View</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center" style="padding: 4rem;">
+            <i class="fas fa-search" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+            <h3>No Pets Found</h3>
+            {% if selected_category %}
+                <p class="text-muted">No {{ selected_category.lower() }} are currently available for adoption.</p>
+                <a href="{{ url_for('adopt') }}" class="btn btn-primary mt-4">
+                    <i class="fas fa-paw"></i>
+                    View All Pets
+                </a>
+            {% else %}
+                <p class="text-muted">No pets are currently available for adoption. Check back soon!</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Call to Action -->
+    {% if not session.user_id %}
+        <div class="card text-center" style="margin-top: 3rem; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none;">
+            <h3 style="margin-bottom: 1rem;">Ready to Adopt?</h3>
+            <p style="margin-bottom: 2rem; opacity: 0.9;">Create an account to start requesting adoptions and find your perfect companion.</p>
+            <div class="flex-center gap-4">
+                <a href="{{ url_for('register') }}" class="btn" style="background-color: white; color: var(--primary-color);">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline" style="border-color: white; color: white;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Adoption Request Modal -->
+<div id="adoptionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Request Adoption</h3>
+            <button class="close-btn" onclick="closeModal('adoptionModal')">&times;</button>
+        </div>
+        <div id="adoptionForm">
+            <div style="margin-bottom: 1rem; padding: 1rem; background-color: var(--bg-color); border-radius: 0.5rem; border-left: 3px solid var(--primary-color);">
+                <p>You're about to request adoption for <strong id="petName"></strong>.</p>
+                <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
+                    This will notify the pet owner about your interest. Please provide details about yourself and why you'd be a great pet parent.
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tell us about yourself and why you'd like to adopt this pet:</label>
+                <textarea id="adoptionMessage" class="form-input form-textarea" placeholder="Please share:&#10;• Your experience with pets&#10;• Your living situation (house/apartment, yard, etc.)&#10;• Why you think this pet would be a great fit&#10;• Your daily routine and how you'll care for the pet&#10;• Any other relevant information" rows="6"></textarea>
+            </div>
+            
+            <div class="flex gap-4">
+                <button class="btn btn-primary" onclick="submitAdoptionRequest()">
+                    <i class="fas fa-heart"></i>
+                    Submit Request
+                </button>
+                <button class="btn btn-outline" onclick="closeModal('adoptionModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentPetId = null;
+
+    function requestAdoption(petId, petName) {
+        currentPetId = petId;
+        document.getElementById('petName').textContent = petName;
+        document.getElementById('adoptionMessage').value = '';
+        openModal('adoptionModal');
+    }
+
+    async function submitAdoptionRequest() {
+        const message = document.getElementById('adoptionMessage').value.trim();
+        
+        if (!message) {
+            showNotification('Please provide information about yourself and why you want to adopt this pet.', 'error');
+            return;
+        }
+
+        if (message.length < 50) {
+            showNotification('Please provide more detailed information (at least 50 characters).', 'error');
+            return;
+        }
+
+        const result = await apiCall(`/request-adoption/${currentPetId}`, 'POST', { message });
+        
+        if (result.success) {
+            showNotification(result.message, 'success');
+            closeModal('adoptionModal');
+            // Refresh the page to update the UI
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(result.message, 'error');
+        }
+    }
+</script>
+{% endblock %}

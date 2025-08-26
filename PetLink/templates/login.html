@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Login - PetLink{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 400px; margin: 0 auto;">
+        <div class="card">
+            <div class="text-center mb-4">
+                <i class="fas fa-sign-in-alt" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h2>Welcome Back</h2>
+                <p class="text-muted">Sign in to your PetLink account</p>
+            </div>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    Don't have an account? 
+                    <a href="{{ url_for('register') }}" style="color: var(--primary-color); text-decoration: none;">
+                        Register here
+                    </a>
+                </p>
+                <p class="text-muted">
+                    Are you a pet owner? 
+                    <a href="{{ url_for('owner_login') }}" style="color: var(--secondary-color); text-decoration: none;">
+                        Owner Login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
