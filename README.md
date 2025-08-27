@@ -1,5 +1,3 @@
-Sure! Here's the full content formatted as a single `README.md` file ready for GitHub:
-
 ````markdown
 # 🐾 PetLink - Pet Adoption and Management System
 
@@ -158,20 +156,3 @@ Contributions are welcome! You can:
 * Improve documentation or UI
 * Add new functionality
 
----
-
-## 📄 License
-
-MIT License – free to use and modify
-
----
-
-Made with ❤ for pets and their future families
-**PetLink - Connecting Hearts, Creating Families 🐾**
-
-```
-
-I can also make a **more compact, GitHub-friendly version** with badges and clickable sections for navigation if you want it to look even more professional on GitHub.  
-
-Do you want me to do that?
-```
