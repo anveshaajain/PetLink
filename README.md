@@ -3,7 +3,7 @@
 
 PetLink is a modern, full-stack Pet Adoption and Management System built using Python Flask and SQLite. It connects loving families with pets in need of homes through an intuitive and responsive web platform.
 
-GitHub Repository: [https://github.com/anveshaajain/Pet-Adoption.git](https://github.com/anveshaajain/Pet-Adoption.git)
+GitHub Repository: [https://github.com/anveshaajain/PetLink.git](https://github.com/anveshaajain/PetLink.git)
 
 ---
 
@@ -41,8 +41,8 @@ GitHub Repository: [https://github.com/anveshaajain/Pet-Adoption.git](https://gi
 
 1. **Clone the Project**
 ```bash
-git clone https://github.com/anveshaajain/Pet-Adoption.git
-cd Pet-Adoption
+git clone https://github.com/anveshaajain/PetLink.git
+cd PetLink
 ````
 
 2. **Install Dependencies**
@@ -52,10 +52,10 @@ pip install flask
 ```
 
 3. **Run the Application**
-   The main file is `app_fixed.py`:
+   The main file is `app.py`:
 
 ```bash
-python app_fixed.py
+python app.py
 ```
 
 4. **Open in Browser**
@@ -141,7 +141,7 @@ PetLink/
 
 ## 🐛 Troubleshooting
 
-* **Port Conflicts:** Change Flask port in `app_fixed.py`
+* **Port Conflicts:** Change Flask port in `app.py`
 * **Database Issues:** Delete `petlink.db` and restart
 * **Module Not Found:** Ensure Flask is installed (`pip install flask`)
 
@@ -155,4 +155,5 @@ Contributions are welcome! You can:
 * Suggest new features
 * Improve documentation or UI
 * Add new functionality
+
 
